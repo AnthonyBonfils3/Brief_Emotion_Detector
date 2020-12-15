@@ -1,0 +1,101 @@
+
+body{
+    background-color:#1e2130;
+    margin: 0px;
+    /*border: 5px solid black;*/
+}
+
+header{
+    padding: 20px;
+}
+#main_block{
+    display: flex;
+    flex-direction: raw;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    border-bottom: 1px #91dfd2;
+}
+#Block_left{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex: 1;
+    
+}
+#left_selector{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #161a28;
+    margin: 5px;
+    padding: 5px;
+    border: 2px solid;
+    border-radius: 20px 20px 20px 20px; 
+}
+#Block_right{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    flex: 3.5;
+    justify-content: space-around;
+}
+/* #91dfd2; tour buton color*/
+/*scroll bar color #4b5460;*/
+/* Block 1 */
+#Block_1{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 5px;
+    flex: 1;
+}
+#Block_1_Article_1{
+    background-color: #161a28;
+    border: 2px solid; 
+    border-radius: 20px 20px 20px 20px; 
+    flex: 2;
+    padding: 5px;
+    margin-right: 5px;
+}
+#Block_1_Article_2{
+    background-color: #161a28;
+    border: 2px solid;
+    border-radius: 20px 20px 20px 20px; 
+    flex: 1;
+    padding: 5px;
+}
+
+/* Block 2 */
+#Block_2{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 5px;
+}
+#Block_2_Article_1{
+    background-color: #161a28;
+    border: 2px solid;
+    border-radius: 20px 20px 20px 20px; 
+    padding: 5px;
+    flex: 1;
+}
+
+#app-homePage{
+    /*background-image: url("./Images/roue_des_emotions.png");*/
+    height: 100vh;
+    width: 100vw;
+    margin-top: 0x;
+}
+#div-roue{
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+}
+#img-roue{
+    justify-content: center;
+    width: 90vw;
+    width: 90vw;
+}

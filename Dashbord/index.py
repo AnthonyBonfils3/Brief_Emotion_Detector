@@ -4,25 +4,25 @@ from dash.dependencies import Input, Output
 
 
 from app import app
+from app import server
 from layoutHomePage import layoutHome
 from layoutPage1 import layoutPage1
 from layoutPage2 import layoutPage2
 import callbacks
 
-app.layout = html.Div([
+app.layout = html.Div(id='app', children=[
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
 
-@app.callback(Output('page-content', 'children'),
-              Input('url', 'pathname'))
+@app.callback(Output('page-content', 'children'), Input('url', 'pathname'))
 def display_page(pathname):
     if pathname == '/' :
-         return layoutHome
-    elif pathname == '/apps/app1':
+        return layoutHome
+    elif pathname == '/Datas%20Analysis':
         return layoutPage1
-    elif pathname == '/apps/app2':
-         return layoutPage2
+    elif pathname == '/Classifications%20Results':
+        return layoutPage2
     else:
         return '404'
 
