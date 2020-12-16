@@ -34,6 +34,9 @@ corpusk = dfk.Text
 targetsk = dfk.Emotion
 targetsk = np.array([1 if x == emot[0] else 2 if x==emot[1] else 3 if x==emot[2] else 4 if x==emot[3] else 5 if x==emot[4] else 6 for x in targetsk])
 
+list_emot = list(emot)
+list_emot.append('all')
+
 
 # Histigramme des émotions
 fig1 = go.Figure()
@@ -41,7 +44,7 @@ fig1 = go.Figure(
     data=[go.Histogram(x=dfk.Emotion, name='words count'), 
                        go.Histogram(x=dfk.Emotion, cumulative_enabled=True, name='cumulative words count')],
     layout ={
-        'title':'Emotions Histogram',
+        #'title':'Emotions Histogram',
         'xaxis_title_text': 'Emotions',
         'yaxis_title_text': 'Count',
         'paper_bgcolor':'rgb(22,26,40)',
@@ -59,41 +62,13 @@ fig1 = go.Figure(
 ################################################# FIGURES #######################################################
 #################################################################################################################
 
-#### histogramme des  mots ####
-# Vobabulary analysis
-vect = CountVectorizer()#stop_words=stopwords
-X = vect.fit_transform(corpusk)
-words = vect.get_feature_names()
-
-# Compute rank
-wsum = np.array(X.sum(0))[0]
-ix = wsum.argsort()[::-1]
-wrank = wsum[ix] 
-labels = [words[i] for i in ix]
-
-# Sub-sample the data to plot. take the 50 first + the rest sample with the given step 
-def subsample(x, end, step=400):
-    return np.hstack((x[:30], x[30:end:step]))
-
-trace = go.Bar(x = subsample(labels, 30), y = subsample(wrank,30),
-               marker = dict(color = 'rgba(255, 174, 255, 0.5)',
-               line = dict(color ='rgb(0,0,0)',width =1.5)),
-)
-layout = go.Layout(title = "Words ordered by rank. The first rank is the most frequent words and the last one is the less present",
-                   xaxis_title_text = 'Word rank',
-                   yaxis_title_text = 'word frequency',
-                   paper_bgcolor = 'rgb(22,26,40)',
-                   plot_bgcolor = 'rgb(22,26,40)',
-                   font_color='white')
-fig2 = go.Figure(data = trace, layout = layout)
-
 #### Pie Chart ###
 fig3 = go.Figure(data=[go.Pie(labels=dfk.Emotion.unique(),
                              values=dfk.groupby('Emotion').Text.nunique(), 
                              textinfo='label+percent',
                             )],
                 layout ={
-                   'title':'Emotions Répartition',
+                   #'title':'Emotions Répartition',
                    'paper_bgcolor':'rgb(22,26,40)',
                    'plot_bgcolor':'rgb(22,26,40)',
                    'font_color':'white'
@@ -101,7 +76,7 @@ fig3 = go.Figure(data=[go.Pie(labels=dfk.Emotion.unique(),
 
 #### Wordcloud avec un masque ####
 
-x = subsample(labels, end=8000, step=10)
+# x = subsample(labels, end=8000, step=10)
 
 # def plot_word_cloud(text, masque) :
     
@@ -143,27 +118,61 @@ layoutPage1 = html.Div([
     html.Tbody(id='main_block',children=[
         html.Div(id='Block_left', children=[
             html.Article(id='left_selector',children=[
-                html.H3('Selectors'),
-                html.H3('Graphique'),
-                html.Div(id='left-cont-fig', children=[
-                    ## Fig 1 : Histigramme Emotions
-                    dcc.Graph(
-                        id='Hist-emotions',
-                        figure=fig1
-                        ),
-                    ])
+                html.H3('Select a DataSet'),
+                dcc.Dropdown(
+                    id='DataSet_dropdown',
+                    options=[
+                        {'label': 'First one (approx 20k entries): Emotion_final.csv', 'value': 'Emotion_final.csv'},
+                        {'label': 'Second one (approx 40k entries): text_emotion.csv', 'value': 'text_emotion.csv'},
+                    ],
+                    optionHeight= 60,
+                    value='Emotion_final.csv',
+                    clearable=False,
+                ),
+                html.H3('Select an emotion'),
+                #html.Button('Submit', id='submit-val', n_clicks=0),
+                dcc.RadioItems(
+                   id='Emotion_radio',
+                   options=[{'label': k, 'value': k} for k in list_emot],
+                   value = 'all'
+                   ),
+                # dcc.Checklist(
+                #     id='Emotion_checklist',
+                #     options=[{'label': k, 'value': k} for k in list(emot)],
+                #     value=list(emot)
+                # ),  
+                html.H3('Emotions histogram'),
+                ## Fig 1 : Histigramme Emotions
+                dcc.Graph(
+                    id='Hist_emotions',
+                    figure=fig1
+                    ),
             ]),
         ]),
         html.Div(id='Block_right', children=[
             html.Section(id='Block_1',children=[
                 html.Article(id='Block_1_Article_1', children=[
+                    html.H3("Words ordered by rank. The first rank is the most frequent words and the last one is the less present"),
                     ## Fig 2 : Histigramme Mots
                     dcc.Graph(
-                        id='Hist-mots',
-                        figure=fig2
+                        id='Hist_mots',
                         ),
+                        dcc.RangeSlider(
+                            id='word_rank_slider',
+                            min=0,
+                            max=100,
+                            step=1,
+                            value=[0, 100],
+                            marks={
+                                0: {'label': 'Top(min)', 'style': {'color': '#77b0b1'}},
+                                50: {'label': 'Top(50)'},
+                                100: {'label': 'Top(Max)', 'style': {'color': '#77b0b1'}}
+                            },
+                            allowCross=False
+                        )
                 ]),
                 html.Article(id='Block_1_Article_2', children=[
+                    html.H3('Emotions Répartition'),
                     dcc.Graph(
                         # Fig 3 : Pie Chart
                         id='left-cont-fig',
@@ -174,45 +183,8 @@ layoutPage1 = html.Div([
             html.Section(id='Block_2',children=[
                 html.Article(id='Block_2_Article_1', children=[
                     html.H3('Datas Table'), 
-                    dash_table.DataTable(
-                        id='app-1-table',
-                        columns=[{'id': c, 'name': c} for c in dfk.columns],
-                        data= dfk.to_dict('records'),
-                        style_as_list_view=True,
-                        fixed_rows={'headers': True},
-                        style_table={
-                            'overflowX': 'auto',
-                            'overflowY': 'auto',
-                            'maxHeight':'400px',
-                            'maxWidth':'1600px'},
-                        #Cell dim + textpos
-                        style_cell_conditional=[{
-                            'height': 'auto',
-                            # all three widths are needed
-                            'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
-                            'whiteSpace': 'normal','textAlign':'center',
-                            'backgroundColor': '#1e2130',
-                            'color': 'white'
-                            }],
-                        #Line strip
-                        style_data_conditional=[{
-                            'if': {'row_index': 'odd'},
-                            'backgroundColor': '#161a28',
-                            'color': 'white',
-                            # 'elif':{'row_index': 'even'},
-                            # 'backgroundColor': '#1e2130',
-                            # 'color': 'white',
-                            }],
-                        style_header={
-                            'backgroundColor': 'rgb(50, 50, 50)',
-                            'fontWeight': 'bold',
-                            'color':'white'},
-                        # Tool Tips
-                        tooltip_data=[{
-                            column: {'value': str(value), 'type': 'markdown'} for column, value in row.items()
-                            } for row in dfk.to_dict('rows')],
-                        tooltip_duration=None
-                    ),  
+                    # Tableau des données
+                    html.Div(id='page1_table')
                 ]),
             ]),        
         ]),
@@ -220,10 +192,7 @@ layoutPage1 = html.Div([
 
     html.Footer([
         html.Br(),
-        dcc.Link('Go to Home Page', href='/'),
-        # html.Br(),
-        # html.Button('Go to Home Page', href='/', n_clicks=0),
-        html.Br(),
-        dcc.Link("Classifications results", href="/Classifications%20Results")     
+        dcc.Link(html.Button('Go to Home Page', className='pth_button'), href='/'),
+        dcc.Link(html.Button('Classifications results', className='pth_button'), href="/Classifications%20Results")     
     ]),
 ])
