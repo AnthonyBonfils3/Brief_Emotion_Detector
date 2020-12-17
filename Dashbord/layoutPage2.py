@@ -1,18 +1,25 @@
+# Dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
+import dash_table
+
+# Classiques
 import pandas as pd
 import numpy as np
-import dash_table
 from collections import defaultdict
+import pickle
 
 # plotly
 import plotly.express as px
 import plotly.graph_objects as go
+
 ### evaluation
 from sklearn.metrics import f1_score, precision_score, recall_score
 from sklearn.pipeline import Pipeline
 from sklearn import metrics
-import pickle
+
+
 
 ## models : pickles
 filename = "pipes_models.pickle"
@@ -25,6 +32,8 @@ corpusk = dfk.Text
 targetsk = dfk.Emotion
 targetsk = np.array([1 if x == emot[0] else 2 if x==emot[1] else 3 if x==emot[2] else 4 if x==emot[3] else 5 if x==emot[4] else 6 for x in targetsk])
 
+
+## Récup les perfs des modèles
 res=defaultdict(list)
 for pipe in pipes:
     # name of the model
@@ -41,6 +50,7 @@ for pipe in pipes:
         recall_score(targetsk, y, average='weighted')
     ])
 
+## Genere la Table des Résultats
 def print_table_res(res):
     # Compute mean and std
     final = {}
@@ -58,24 +68,15 @@ def print_table_res(res):
 df_res = print_table_res(res)
 
 
-cm = metrics.confusion_matrix(targetsk, y)
-fig1 = go.Figure(data=[go.Heatmap(
-                   z=cm,
-                   x=emot,
-                   y=emot,
-                   hoverongaps = False)],
-                layout ={
-                   'title':'Correlation Matrix',
-                   'xaxis_title_text': 'Predicted label',
-                   'yaxis_title_text': 'Actual label',
-                   'paper_bgcolor':'rgb(22,26,40)',
-                   'plot_bgcolor':'rgb(22,26,40)',
-                   'font_color':'white'
-               })
-
+########################################################################################
+#################################### LAYOUT ############################################
+########################################################################################
 layoutPage2 = html.Div([
     html.Header([
-        html.H1('Emotion detector'),
+        dcc.Link(html.Button('Go to Home Page', className='pth_button'), href='/'),
+        dcc.Link(html.Button('Datas analysis', className='pth_button'), href='/Datas%20Analysis'),
+        html.Br(),
+        html.H1('Emotions detector'),
         html.H2('Classification Results'),
 
     ]),
@@ -85,6 +86,8 @@ layoutPage2 = html.Div([
     html.Tbody(id='main_block',children=[
         html.Div(id='Block_left', children=[
             html.Article(id='left_selector',children=[
+
+                ## Data Selector
                 html.H3('Select a DataSet'),
                 dcc.Dropdown(
                     id='DataSet_dropdown',
@@ -96,31 +99,48 @@ layoutPage2 = html.Div([
                     value='Emotion_final.csv',
                     clearable=False,
                 ),
+
+                ## Model Selector
                 html.H3('Select a model'),
                 dcc.RadioItems(
-                    id='Emotion_radio',
-                    options=[{'label': 'Stochastic Gradiant Decent', 'value': 'SGD'},
-                        {'label': 'Linear SVM', 'value': 'SVM'},
-                        {'label': 'Logistic Regression', 'value': 'LRG'},
-                        {'label': 'Decision Tree', 'value': 'DTC'},
-                        {'label': 'Complément NB', 'value': 'cNB'},
+                    id='solver_radio',
+                    options=[{'label': 'Stochastic Gradiant Decent', 'value': 0},
+                        {'label': 'Linear SVM', 'value': 1},
+                        {'label': 'Logistic Regression', 'value': 2},
+                        {'label': 'Decision Tree', 'value': 3},
+                        {'label': 'Complément NB', 'value': 4},
                         ],
-                    value = 'SGD'
+                    value = 0,
                     ),
-
             ]),
         ]),
         html.Div(id='Block_right', children=[
             html.Section(id='Block_1',children=[
+
+                ## Correlation Matrix
                 html.Article(id='Block_1_Article_1', children=[
-                    dcc.Graph(id='corr_matrix', figure=fig1)
+                    html.H3('Correlation Matrix'),
+                    dcc.Graph(id='corr_matrix')
                 ]),
                 html.Article(id='Block_1_Article_2', children=[
-
+                    
+                    ## ROC Curve or Precision recall
+                    dbc.Tabs(
+                        [
+                            dbc.Tab(label="ROC Curves", tab_id="ROC"),
+                            dbc.Tab(label="Precision-Recall Curves", tab_id="prec_recall", activeTabClassName='Tab'
+                            ),
+                        ],
+                        id="tabs_fig",
+                        active_tab="ROC",
+                    ),
+                    html.Div(id="tab_content"),
                 ]),
             ]),
             html.Section(id='Block_2',children=[
                 html.Article(id='Block_2_Article_1', children=[
+
+                    ## Tableau récap modèles
                     html.H3('Predictions results for differents models'), 
                     dash_table.DataTable(
                         id='app_2_table',
@@ -132,13 +152,13 @@ layoutPage2 = html.Div([
                         style_table={
                             'overflowX': 'auto',
                             'overflowY': 'auto',
-                            'maxHeight':'300px',
-                            'maxWidth':'1300px'},
+                            'maxHeight':'400px',
+                            'maxWidth':'1000px'},
                         #Cell dim + textpos
                         style_cell_conditional=[{
                             'height': 'auto',
                             # all three widths are needed
-                            'minWidth': '150px', 'width': '150px', 'maxWidth': '200px',
+                            'minWidth': '100px', 'width': '120px', 'maxWidth': '300px',
                             'whiteSpace': 'normal','textAlign':'center',
                             'backgroundColor': '#1e2130',
                             'color': 'white'

@@ -30,6 +30,7 @@ header{
     flex-wrap: wrap;
     justify-content: space-between;
     flex: 1; 
+    max-width: 400px;
 }
 #left_selector{
     display: flex;
@@ -45,6 +46,12 @@ header{
     border-radius: 20px 20px 20px 20px; 
     box-shadow:2px 2px 5px #91dfd2; 
 }
+#solver_radio{
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+    color: white;
+}
 #Emotion_radio{
     display: flex;
     flex-direction: column;
@@ -59,7 +66,7 @@ header{
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    flex: 3.5;
+    flex: 4;
     justify-content: space-around;
 }
 /* #91dfd2; tour buton color*/
@@ -90,6 +97,9 @@ header{
     padding: 5px;
     margin: 5px;
     box-shadow:2px 2px 5px #91dfd2; 
+}
+.Tab{
+    background-color:  #91dfd2;
 }
 
 /* Block 2 */
@@ -122,16 +132,42 @@ header{
 #modal_Home{
     font-family: "Times New Roman", Times, serif;
 }
+#Block_home_Page{
+    display: flex;
+    flex-direction: raw;
+    justify-content: space-around;
+}
+#home_page_left{
+    background-color: #161a28;
+    border: 2px solid;
+    border-radius: 20px 20px 20px 20px; 
+    margin: 5px;
+    padding: 5px;
+    flex:1;
+}
+#button{
+    background-color:  #91dfd2;
+}
+#output_container_button{
+    color: white;
+}
+#output_container{  
+    color: white;
+
+}
+#home_page_right{
+    justify-content: center;
+    margin: 5px;
+    padding: 5px;
+    flex:1;
+}
 #div_roue{
     justify-content: center;
-    height: 100vh;
-    width: 100vw;
-    float: right;
-
 }
 #img_roue{
     justify-content: center;
+    margin: 5px;
+    padding: 5px;
     width: 40vw;
     width: 40vw;
-    float: right;
 }

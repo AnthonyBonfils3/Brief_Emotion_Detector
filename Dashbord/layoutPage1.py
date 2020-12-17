@@ -55,7 +55,8 @@ fig1 = go.Figure(
             'y':0.99,
             'xanchor':"left",
             'x':0.01
-        }})
+            }
+        })
     
 
 #################################################################################################################
@@ -108,7 +109,10 @@ fig3 = go.Figure(data=[go.Pie(labels=dfk.Emotion.unique(),
 #################################################################################################################
 layoutPage1 = html.Div([
     html.Header([
-        html.H1('Emotion detector'),
+        dcc.Link(html.Button('Go to Home Page', className='pth_button'), href='/'),
+        dcc.Link(html.Button('Classifications results', className='pth_button'), href="/Classifications%20Results"),
+        html.Br(),
+        html.H1('Emotions detector'),
         html.H2('Datas Analysis'),
 
     ]),
@@ -118,6 +122,8 @@ layoutPage1 = html.Div([
     html.Tbody(id='main_block',children=[
         html.Div(id='Block_left', children=[
             html.Article(id='left_selector',children=[
+
+                ## Data Selector
                 html.H3('Select a DataSet'),
                 dcc.Dropdown(
                     id='DataSet_dropdown',
@@ -129,19 +135,16 @@ layoutPage1 = html.Div([
                     value='Emotion_final.csv',
                     clearable=False,
                 ),
+
+                ## Emotion selector
                 html.H3('Select an emotion'),
-                #html.Button('Submit', id='submit-val', n_clicks=0),
                 dcc.RadioItems(
                    id='Emotion_radio',
                    options=[{'label': k, 'value': k} for k in list_emot],
                    value = 'all'
                    ),
-                # dcc.Checklist(
-                #     id='Emotion_checklist',
-                #     options=[{'label': k, 'value': k} for k in list(emot)],
-                #     value=list(emot)
-                # ),  
                 html.H3('Emotions histogram'),
+
                 ## Fig 1 : Histigramme Emotions
                 dcc.Graph(
                     id='Hist_emotions',
@@ -152,8 +155,9 @@ layoutPage1 = html.Div([
         html.Div(id='Block_right', children=[
             html.Section(id='Block_1',children=[
                 html.Article(id='Block_1_Article_1', children=[
-                    html.H3("Words ordered by rank. The first rank is the most frequent words and the last one is the less present"),
+
                     ## Fig 2 : Histigramme Mots
+                    html.H3("Words ordered by rank. The first rank is the most frequent words and the last one is the less present"),
                     dcc.Graph(
                         id='Hist_mots',
                         ),
@@ -162,7 +166,7 @@ layoutPage1 = html.Div([
                             min=0,
                             max=100,
                             step=1,
-                            value=[0, 100],
+                            value=[2, 50],
                             marks={
                                 0: {'label': 'Top(min)', 'style': {'color': '#77b0b1'}},
                                 50: {'label': 'Top(50)'},
@@ -171,6 +175,7 @@ layoutPage1 = html.Div([
                             allowCross=False
                         )
                 ]),
+
                 html.Article(id='Block_1_Article_2', children=[
                     html.H3('Emotions Répartition'),
                     dcc.Graph(
