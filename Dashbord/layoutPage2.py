@@ -158,7 +158,7 @@ layoutPage2 = html.Div([
                                 'overflowX': 'auto',
                                 'overflowY': 'auto',
                                 'maxHeight':'400px',
-                                'maxWidth':'1000px'},
+                                'maxWidth':'70vw'},
                             #Cell dim + textpos
                             style_cell_conditional=[{
                                 'height': 'auto',

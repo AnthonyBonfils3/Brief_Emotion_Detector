@@ -16,15 +16,16 @@ layoutHome = html.Div(id='app-homePage', children=[
     html.Div(id='Block_home_Page', children=[
         html.Section(id='home_page_left', children=[
             html.Br(),
-            modal,
             html.H2('Welcome to the API who analyse emotions in your sentences'),
+            html.Br(),
+            modal,
             html.Br(),
             html.Br(),
             html.Br(),
             html.Br(),
             dcc.Textarea(
                 id='text_box_home',
-                placeholder='Enter your text and test it',
+                placeholder='Enter your text and show the predicted emotion',
                 #style={'width': '95%', 'color':'#91dfd2'}
             ),
             html.Br(),

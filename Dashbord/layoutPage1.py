@@ -74,7 +74,7 @@ layoutPage1 = html.Div([
                 ]),
 
                 html.Article(id='Block_1_Article_2', children=[
-                    html.H3('Emotions Répartition'),
+                    html.H3('Emotions Repartition'),
                     dcc.Graph(
                         # Fig 3 : Pie Chart
                         id='Pie_chart'

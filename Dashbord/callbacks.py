@@ -79,10 +79,8 @@ def update_output(n_clicks, text):
         text = [text]
         pred= pipes[0].predict(text)
 
-        #emotion = 'sadness'
-        #pred= pipes[0].predict([text])
         emotion = emot[pred-1]
-        return  u'You have entered: \n{}. Your text seams to be an expression of {}.'.format([text], emotion)
+        return  u'You have entered: \n{}. Your text seams to be an expression of {}.'.format(text[0], emotion[0])
 
 
 
