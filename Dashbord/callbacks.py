@@ -42,7 +42,11 @@ pipes = pickle.load(open(filename, 'rb'))
 def subsample(x, init, end, step=400):
     return np.hstack((x[init:end], x[end:end:step]))
 
-
+all_options = {
+    'Emotion_final.csv': ['all', 'sadness', 'anger', 'love', 'surprise', 
+                          'fear', 'happy'],
+    'text_emotion.csv': [u'all', 'empty', 'sadness', 'enthusiasm', 'neutral', 'worry', 'surprise', 'love', 'fun', 'hate', 'happy', 'boredom', 'relief', 'anger']
+}
 
 
 
@@ -69,7 +73,7 @@ def display_value(value):
 @app.callback(
     Output('output_container', 'children'),
     [Input('submit_button', 'n_clicks')],
-    [State('input_box', 'value')])
+    [State('text_box_home', 'value')])
 def update_output(n_clicks, text):
     if n_clicks > 0:
         text = [text]
@@ -86,17 +90,153 @@ def update_output(n_clicks, text):
 #############################################################################
 ################################# PAGE 1 ####################################
 #############################################################################
+
+@app.callback(
+    Output('Emotion_radio', 'options'),
+    Input('DataSet_dropdown', 'value'))
+def set_emotions_options(selected_dataset):
+    return [{'label': i, 'value': i} for i in all_options[selected_dataset]]
+
+@app.callback(
+    Output('Emotion_radio', 'value'),
+    Input('Emotion_radio', 'options'))
+def set_emotions_value(available_options):
+    return available_options[0]['value']
+
+
+# Histigramme des émotions
+@app.callback(
+    Output('Hist_emotions','figure'), 
+    Input('DataSet_dropdown', 'value'))
+def display_hist_emotions_page1(dataset):
+    df = pd.read_csv('./Datas/'+dataset)
+    if dataset == 'text_emotion.csv':
+        df.columns = ["Tweet_id", "Emotion", "Author", "Text"]
+        df = df.drop(columns='Tweet_id')
+        df = df.drop(columns='Author')
+        df.loc[df.Emotion =='happiness', 'Emotion'] = 'happy'
+    
+    fig_Hist_Emot = go.Figure(
+        data=[go.Histogram(x=df.Emotion, 
+                           name='words count', 
+                           ), 
+        go.Histogram(x=df.Emotion, 
+                     cumulative_enabled=True, 
+                     name='cumulative <br>words count', 
+                     )],
+        layout ={
+            'xaxis_title_text': 'Emotions',
+            'paper_bgcolor':'rgb(22,26,40)',
+            'plot_bgcolor':'rgb(22,26,40)',
+            'font_color':'white',
+            'legend' : {
+                'yanchor':"top",
+                'y':1.2,
+                'xanchor':"left",
+                'x':0.01
+                }
+            })
+    return fig_Hist_Emot
+
+
+# Histograme mots
+@app.callback(
+    Output('Hist_mots','figure'), 
+    Input('Emotion_radio', 'value'),
+    Input('word_rank_slider', 'value'),
+    Input('DataSet_dropdown', 'value'))
+def display_hist_mots_page1(Emotion_value, slid_value, dataset):
+    df_temp = pd.read_csv('./Datas/'+dataset)
+    if dataset == 'text_emotion.csv':
+        df_temp.columns = ["Tweet_id", "Emotion", "Author", "Text"]
+        df_temp = df_temp.drop(columns='Tweet_id')
+        df_temp = df_temp.drop(columns='Author')
+        df_temp.loc[df_temp.Emotion =='happiness', 'Emotion'] = 'happy'
+
+    if Emotion_value == 'all':
+        df = df_temp
+    else:
+        df=df_temp.loc[df_temp.Emotion==Emotion_value]
+
+    del df_temp
+
+    vect = CountVectorizer(stop_words='english')
+    X = vect.fit_transform(df.Text)
+    words = vect.get_feature_names()
+    # Compute rank
+    wsum = np.array(X.sum(0))[0]
+    ix = wsum.argsort()[::-1]
+    wrank = wsum[ix] 
+    labels = [words[i] for i in ix]
+
+    trace = go.Bar(x = subsample(labels, slid_value[0], slid_value[1]), 
+                   y = subsample(wrank, slid_value[0], slid_value[1]),
+                   marker = dict(color = 'rgba(255, 174, 255, 0.5)',
+                   line = dict(color ='rgb(0,0,0)',width =1.5)),
+    )
+    layout = go.Layout(
+                    xaxis_title_text = 'Word rank',
+                    yaxis_title_text = 'word frequency',
+                    paper_bgcolor = 'rgb(22,26,40)',
+                    plot_bgcolor = 'rgb(22,26,40)',
+                    font_color='white')
+    figure = go.Figure(data = trace, layout = layout)
+    return figure
+
+@app.callback(
+    Output('Pie_chart','figure'), 
+    Input('DataSet_dropdown', 'value'))
+def display_Pie_Chart_page1(dataset):
+    df = pd.read_csv('./Datas/'+dataset)
+    if dataset == 'text_emotion.csv':
+        df.columns = ["Tweet_id", "Emotion", "Author", "Text"]
+        df = df.drop(columns='Tweet_id')
+        df = df.drop(columns='Author')
+        df.loc[df.Emotion =='happiness', 'Emotion'] = 'happy'
+    #### Pie Chart ###
+    fig_Pie_chart = go.Figure(data=[go.Pie(labels=df.Emotion.unique(),
+                                values=df.groupby('Emotion').Text.nunique(), 
+                                textinfo='label+percent',
+                                )],
+                    layout ={
+                    #'title':'Emotions Répartition',
+                    'paper_bgcolor':'rgb(22,26,40)',
+                    'plot_bgcolor':'rgb(22,26,40)',
+                    'font_color':'white',
+                    'legend' : {
+                        'orientation' : "h",
+                        'yanchor':"top",
+                        'y':2,
+                        'xanchor':"left",
+                        'x':-0.2
+                        }
+                })   
+    return fig_Pie_chart
+
 @app.callback(
     Output('page1_table','children'), 
-    Input('Emotion_radio', 'value'))
-def display_table_page1(Emotion_value):
+    Input('Emotion_radio', 'value'),
+    Input('DataSet_dropdown', 'value'))
+def display_table_page1(Emotion_value, dataset):
+    df_temp = pd.read_csv('./Datas/'+dataset)
+    if dataset == 'text_emotion.csv':
+        df_temp.columns = ["Tweet_id", "Emotion", "Author", "Text"]
+        df_temp = df_temp.drop(columns='Tweet_id')
+        df_temp = df_temp.drop(columns='Author')
+        df_temp.loc[df_temp.Emotion =='happiness', 'Emotion'] = 'happy'
+        df_temp = df_temp.reindex(columns=['Text','Emotion'])
+
     if Emotion_value == 'all':
-        df = dfk
+        df = df_temp
     else:
-        df=dfk.loc[dfk.Emotion==Emotion_value]
+        df=df_temp.loc[df_temp.Emotion==Emotion_value]
+        
+    del df_temp
 
     table = dash_table.DataTable(
         id='app-1-table',
+        export_format='csv',
+        export_headers='display',
         columns=[{'id': c, 'name': c} for c in df.columns],
         data= df.to_dict('records'),
         style_as_list_view=True,
@@ -105,15 +245,17 @@ def display_table_page1(Emotion_value):
             'overflowX': 'auto',
             'overflowY': 'auto',
             'maxHeight':'400px',
-            'maxWidth':'1600px'},
+            'minWidth':'70vw',
+            'maxWidth':'1600px'
+            },
 
-        #Cell dim + textpos
         style_cell_conditional=[
             #{'if': {'column_id': 'Emotion'},'width': '15%'},
-            {'if': {'column_id': 'Text'},'width': '50%'},{
+            {'if': {'column_id': 'Text'},'width': '58vw'},
+            {
             'height': 'auto',
-            # all three widths are needed
-            'minWidth': '180px', 'width': '180px', 'maxWidth': '180px',
+            ## all three widths are needed
+            'minWidth': '50px', 'width': '70px', 'maxWidth': '300px',
             'whiteSpace': 'normal','textAlign':'center',
             'backgroundColor': '#1e2130',
             'color': 'white'
@@ -137,42 +279,6 @@ def display_table_page1(Emotion_value):
 
     return table
 
-@app.callback(
-    Output('Hist_mots','figure'), 
-    Input('Emotion_radio', 'value'),
-    [Input('word_rank_slider', 'value')])
-def display_hist_mots_page1(Emotion_value, slid_value):
-    if Emotion_value == 'all':
-        df = dfk
-    else:
-        df=dfk.loc[dfk.Emotion==Emotion_value]
-
-    vect = CountVectorizer(stop_words='english')#stop_words=stopwords
-    X = vect.fit_transform(df.Text)
-    words = vect.get_feature_names()
-
-    # Compute rank
-    wsum = np.array(X.sum(0))[0]
-    ix = wsum.argsort()[::-1]
-    wrank = wsum[ix] 
-    labels = [words[i] for i in ix]
-
-    trace = go.Bar(x = subsample(labels, slid_value[0], slid_value[1]), 
-                   y = subsample(wrank, slid_value[0], slid_value[1]),
-                   marker = dict(color = 'rgba(255, 174, 255, 0.5)',
-                   line = dict(color ='rgb(0,0,0)',width =1.5)),
-    )
-    layout = go.Layout(
-                    xaxis_title_text = 'Word rank',
-                    yaxis_title_text = 'word frequency',
-                    paper_bgcolor = 'rgb(22,26,40)',
-                    plot_bgcolor = 'rgb(22,26,40)',
-                    font_color='white')
-    figure = go.Figure(data = trace, layout = layout)
-    return figure
-
-
-
 
 
 #############################################################################
@@ -189,7 +295,8 @@ def display_corr_matrix_page2(Model_value):
                     z=cm,
                     x=emot,
                     y=emot,
-                   hovertemplate = "<b>Predicted :</b> %{x} <br>"+"<b>Real :</b> %{y} <br>"
+                    colorscale="Viridis",
+                    hovertemplate = "<b>Predicted :</b> %{x} <br>"+"<b>Real :</b> %{y} <br>"
                                    + "<b>Count :</b> %{z} <br>"
                                    + "<extra></extra>")],
                     layout ={

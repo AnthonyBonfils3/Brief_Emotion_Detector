@@ -88,6 +88,7 @@ header{
     padding: 5px;
     margin: 5px;
     box-shadow:2px 2px 5px #91dfd2; 
+    min-width: 300px;
 }
 #Block_1_Article_2{
     background-color: #161a28;
@@ -100,6 +101,14 @@ header{
 }
 .Tab{
     background-color:  #91dfd2;
+}
+#div_table_data{
+    display: flex;
+    justify-content: space-around;
+}
+#div_table_res{
+    display: flex;
+    justify-content: space-around;
 }
 
 /* Block 2 */
@@ -155,11 +164,26 @@ header{
     color: white;
 
 }
+
+/* HOME */
 #home_page_right{
     justify-content: center;
     margin: 5px;
     padding: 5px;
     flex:1;
+}
+#text_box_home{
+    width: 95%;
+    background-color: #91dfd2;
+    color: black;
+}
+#div_submit_button{
+    display: flex;
+    justify-content: right;
+}
+#submit_button{
+    background-color:gray;
+    border-radius: 10px 10px 10px 10px; 
 }
 #div_roue{
     justify-content: center;
@@ -168,6 +192,6 @@ header{
     justify-content: center;
     margin: 5px;
     padding: 5px;
-    width: 40vw;
-    width: 40vw;
+    width: 44vw;
+    width: 44vw;
 }

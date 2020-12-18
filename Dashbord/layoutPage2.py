@@ -92,8 +92,8 @@ layoutPage2 = html.Div([
                 dcc.Dropdown(
                     id='DataSet_dropdown',
                     options=[
-                        {'label': 'First one (approx 20k entries): Emotion_final.csv', 'value': 'Emotion_final.csv'},
-                        {'label': 'Second one (approx 40k entries): text_emotion.csv', 'value': 'text_emotion.csv'},
+                        {'label': 'First one : Kaggle', 'value': 'Emotion_final.csv'},
+                        {'label': 'Second one : Data.word', 'value': 'text_emotion.csv'},
                     ],
                     optionHeight= 60,
                     value='Emotion_final.csv',
@@ -120,7 +120,9 @@ layoutPage2 = html.Div([
                 ## Correlation Matrix
                 html.Article(id='Block_1_Article_1', children=[
                     html.H3('Correlation Matrix'),
-                    dcc.Graph(id='corr_matrix')
+                    dcc.Graph(id='corr_matrix', 
+                        config={'responsive':True}
+                    ), 
                 ]),
                 html.Article(id='Block_1_Article_2', children=[
                     
@@ -142,43 +144,47 @@ layoutPage2 = html.Div([
 
                     ## Tableau récap modèles
                     html.H3('Predictions results for differents models'), 
-                    dash_table.DataTable(
-                        id='app_2_table',
-                        columns=[{'id': c, 'name': c} for c in df_res.columns],
-                        data= df_res.to_dict('records'),
-                        style_as_list_view=True,
-                        fixed_rows={'headers': True},
-                        #fixed_columns={'headers': True, 'data' :1},# garder les names quand on scroll : le chiffre correspond à l'indice de la colonne
-                        style_table={
-                            'overflowX': 'auto',
-                            'overflowY': 'auto',
-                            'maxHeight':'400px',
-                            'maxWidth':'1000px'},
-                        #Cell dim + textpos
-                        style_cell_conditional=[{
-                            'height': 'auto',
-                            # all three widths are needed
-                            'minWidth': '100px', 'width': '120px', 'maxWidth': '300px',
-                            'whiteSpace': 'normal','textAlign':'center',
-                            'backgroundColor': '#1e2130',
-                            'color': 'white'
-                            }],
-                        #Line strip
-                        style_data_conditional=[{
-                            'if': {'row_index': 'odd'},
-                            'backgroundColor': '#161a28',
-                            'color': 'white'
-                            }],
-                        style_header={
-                            'backgroundColor': 'rgb(50, 50, 50)',
-                            'fontWeight': 'bold',
-                            'color':'white'},
-                        # Tool Tips
-                        tooltip_data=[{
-                            column: {'value': str(value), 'type': 'markdown'} for column, value in row.items()
-                            } for row in df_res.to_dict('rows')],
-                        tooltip_duration=None
-                        ),  
+                    html.Div(id='div_table_res',children=[
+                        dash_table.DataTable(
+                            id='app_2_table',
+                            export_format='csv',
+                            export_headers='display',
+                            columns=[{'id': c, 'name': c} for c in df_res.columns],
+                            data= df_res.to_dict('records'),
+                            style_as_list_view=True,
+                            fixed_rows={'headers': True},
+                            #fixed_columns={'headers': True, 'data' :1},# garder les names quand on scroll : le chiffre correspond à l'indice de la colonne
+                            style_table={
+                                'overflowX': 'auto',
+                                'overflowY': 'auto',
+                                'maxHeight':'400px',
+                                'maxWidth':'1000px'},
+                            #Cell dim + textpos
+                            style_cell_conditional=[{
+                                'height': 'auto',
+                                # all three widths are needed
+                                'minWidth': '100px', 'width': '120px', 'maxWidth': '300px',
+                                'whiteSpace': 'normal','textAlign':'center',
+                                'backgroundColor': '#1e2130',
+                                'color': 'white'
+                                }],
+                            #Line strip
+                            style_data_conditional=[{
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': '#161a28',
+                                'color': 'white'
+                                }],
+                            style_header={
+                                'backgroundColor': 'rgb(50, 50, 50)',
+                                'fontWeight': 'bold',
+                                'color':'white'},
+                            # Tool Tips
+                            tooltip_data=[{
+                                column: {'value': str(value), 'type': 'markdown'} for column, value in row.items()
+                                } for row in df_res.to_dict('rows')],
+                            tooltip_duration=None
+                            ),
+                        ]),
                 ]),
             ]),        
         ]),

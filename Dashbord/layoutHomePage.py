@@ -6,8 +6,6 @@ import dash_table
 from app import app
 from my_imports.my_var import modal
 
-df = pd.read_csv("./Datas/Emotion_final.csv")
-
 layoutHome = html.Div(id='app-homePage', children=[
 
     dcc.Link(html.Button('Datas analysis', className='pth_button'), href='/Datas%20Analysis'),
@@ -25,11 +23,14 @@ layoutHome = html.Div(id='app-homePage', children=[
             html.Br(),
             html.Br(),
             dcc.Textarea(
-                id='input_box',
+                id='text_box_home',
                 placeholder='Enter your text and test it',
-                style={'width': '100%', 'height': 100, 'color':'withe'}
+                #style={'width': '95%', 'color':'#91dfd2'}
             ),
-            html.Button('Submit', id='submit_button', n_clicks=0),
+            html.Br(),
+            html.Div(id='div_submit_button', children=[
+                html.Button('Submit', id='submit_button', n_clicks=0),
+            ]),
             html.Div(id='output_container'),      
                
         ]),
