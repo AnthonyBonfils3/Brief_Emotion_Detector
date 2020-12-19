@@ -2,7 +2,7 @@
 
 https://emotiondetectoranthony.herokuapp.com/
 
-##La roue des émotions
+## La roue des émotions
 
 Construit d’après les travaux du psychologue américain Robert Plutchik, la roue des émotions est un modèle des émotions humaines et peut facilement servir à définir des 
 personnages, ainsi que leur évolution dans une trame narrative.
