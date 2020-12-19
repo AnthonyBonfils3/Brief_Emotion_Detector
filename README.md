@@ -76,7 +76,8 @@ l'émotion du texte envoyé.
 * durée: 7 jours
 
 ### ressources
-https://www.actuia.com/contribution/victorbigand/tutoriel-tal-pour-les-debutants-classification-de-texte/
-https://bbengfort.github.io/tutorials/2016/05/19/text-classification-nltk-sckit-learn.html
-https://medium.com/neuronio/from-sentiment-analysis-to-emotion-recognition-a-nlp-story-bcc9d6ff61ae
-https://realpython.com/sentiment-analysis-python/#how-classification-works
+
+https://www.actuia.com/contribution/victorbigand/tutoriel-tal-pour-les-debutants-classification-de-texte/ <br>
+https://bbengfort.github.io/tutorials/2016/05/19/text-classification-nltk-sckit-learn.html <br>
+https://medium.com/neuronio/from-sentiment-analysis-to-emotion-recognition-a-nlp-story-bcc9d6ff61ae <br>
+https://realpython.com/sentiment-analysis-python/#how-classification-works <br>
